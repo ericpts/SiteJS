@@ -8,8 +8,6 @@
 
 function game() {
 
-alert("here!");
-
 var canvas = document.getElementById("canvas");
 var ctx = canvas.getContext("2d");
 
@@ -19,12 +17,15 @@ var kHeight = window.innerHeight;
 ctx.canvas.width = kWidth;
 ctx.canvas.height = kHeight;
 
-var shrinkRate = 50;
+var shrinkRate = 20;
 
 //delete a circle smaller than this
 var radiusThreshold = 5;
 
-var maxRadius = 500;
+var minRadius = 100;
+var maxRadius = 200;
+
+var userScore = 0;
 
 function Circle(x, y, r) {
 	this.x = x;
@@ -41,8 +42,14 @@ function distance(c1, c2) {
 
 Circles = [];
 
+function circleScore(c) {
+	var delta = maxRadius * maxRadius - c.r * c.r;
+	return delta;
+}
+
 function circleHasNoCollisions(c) {
-	for(other in Circles) {
+	for(oth in Circles) {
+		var other = Circles[oth];
 		var d = distance(c, other);
 		if (d < c.r + other.r) {
 			return false;
@@ -55,28 +62,41 @@ function circleHasNoCollisions(c) {
 
 function randomCircle() {
 
-	var x = Math.random() * kWidth;
-	var y = Math.random() * kHeight;
-	var r = Math.random() * maxRadius;
+	var minR = minRadius;
+	while(true) {
 
-	c = new Circle(x, y, r);
+		var x = Math.random() * kWidth;
+		var y = Math.random() * kHeight;
+		var r = minR + Math.random() * (maxRadius - minR);
 
-	if (circleHasNoCollisions(c)) {
-		return c;
-	} else {
-		return randomCircle();
+		c = new Circle(x, y, r);
+
+		if (circleHasNoCollisions(c)) {
+			return c;
+		}
+
+		minR--;
 	}
 
 }
 
 function resetCanvas() {
-
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
 function drawCircles() {
-	for(circle in Circles) {
-		ctx.arc(circle.x, circle.y, circle.r, 0, Math.PI);
+	for(c in Circles) {
+		var circle = Circles[c];
+		ctx.beginPath();
+		ctx.arc(circle.x, circle.y, circle.r, 0, 2 * Math.PI, false);
+		ctx.fill();
 	}
+}
+
+function drawScore() {
+	var text = "Score " + userScore;
+	ctx.font = "70px serif";
+	ctx.fillText(text, 50,  50);
 }
 
 
@@ -102,26 +122,47 @@ function addNewCircle(diff) {
 var lastTime = Date.now();
 
 function nextStep() {
-	console.log("in nextStep");
 	var now = Date.now();
-	var diff = now - lastTime;
+	var diff = (now - lastTime) / 1000;
+	lastTime = now;
 	shrinkCircles(diff);
 	addNewCircle(diff);
+
+	resetCanvas();
 	drawCircles();
+	drawScore();
+
+	setTimeout(nextStep, 100);
 }
 
-setInterval(nextStep, 10);
+setTimeout(nextStep, 100);
 
-console.log("Init game!");
+canvas.addEventListener('click', function(event) {
+	var x = event.pageX - canvas.offsetLeft;
+	var y = event.pageY - canvas.offsetTop;
+
+	click = new Circle(x, y, 0);
+
+	for (idx in Circles) {
+		var circle = Circles[idx];
+		if (distance(click, circle) <= circle.r) {
+		//circle was clicked
+			userScore += circleScore(circle);
+			Circles.splice(idx, 1);
+			console.log("clicked a circle!");
+			return;
+		}
+	};
+});
 
 };
+
+window.onload = game;
 
 
 
 
 </script>
-
-<style>
 
 </head>
 
