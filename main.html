@@ -43,8 +43,8 @@ function distance(c1, c2) {
 Circles = [];
 
 function circleScore(c) {
-	var delta = maxRadius * maxRadius - c.r * c.r;
-	return delta;
+	var delta = Math.sqrt(maxRadius * maxRadius - c.r * c.r);
+	return Math.floor(delta);
 }
 
 function circleHasNoCollisions(c) {
