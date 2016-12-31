@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title> Jocul </title>
+<script>
+
+
+function game() {
+
+alert("here!");
+
+var canvas = document.getElementById("canvas");
+var ctx = canvas.getContext("2d");
+
+var kWidth = window.innerWidth;
+var kHeight = window.innerHeight;
+
+ctx.canvas.width = kWidth;
+ctx.canvas.height = kHeight;
+
+var shrinkRate = 50;
+
+//delete a circle smaller than this
+var radiusThreshold = 5;
+
+var maxRadius = 500;
+
+function Circle(x, y, r) {
+	this.x = x;
+	this.y = y;
+	this.r = r;
+}
+
+function distance(c1, c2) {
+	dx = c1.x - c2.x;
+	dy = c1.y - c2.y;
+	
+	return Math.sqrt(dx * dx + dy * dy);
+}
+
+Circles = [];
+
+function circleHasNoCollisions(c) {
+	for(other in Circles) {
+		var d = distance(c, other);
+		if (d < c.r + other.r) {
+			return false;
+		}
+	}
+
+	return c.x - c.r >= 0 && c.x + c.r <= kWidth &&
+	       c.y - c.r >= 0 && c.y + c.r <= kHeight;
+}
+
+function randomCircle() {
+
+	var x = Math.random() * kWidth;
+	var y = Math.random() * kHeight;
+	var r = Math.random() * maxRadius;
+
+	c = new Circle(x, y, r);
+
+	if (circleHasNoCollisions(c)) {
+		return c;
+	} else {
+		return randomCircle();
+	}
+
+}
+
+function resetCanvas() {
+
+}
+
+function drawCircles() {
+	for(circle in Circles) {
+		ctx.arc(circle.x, circle.y, circle.r, 0, Math.PI);
+	}
+}
+
+
+function shrinkCircles(diff) {
+	var dec = diff * shrinkRate;
+	var len = Circles.length;
+	for(var i = len - 1; i >= 0; --i) {
+		var c = Circles[i];
+		c.r -= dec;
+		if (c.r <= radiusThreshold) {
+			Circles.splice(i, 1);
+		}
+	}
+}
+
+function addNewCircle(diff) {
+	var rnd = Math.random();
+	if (rnd <= diff) {
+		Circles.push(randomCircle());
+	}
+}
+
+var lastTime = Date.now();
+
+function nextStep() {
+	console.log("in nextStep");
+	var now = Date.now();
+	var diff = now - lastTime;
+	shrinkCircles(diff);
+	addNewCircle(diff);
+	drawCircles();
+}
+
+setInterval(nextStep, 10);
+
+console.log("Init game!");
+
+};
+
+
+
+
+</script>
+
+<style>
+
+</head>
+
+<body>
+	<canvas id="canvas"> </canvas>
+</body>
+
+</html>
