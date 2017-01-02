@@ -139,7 +139,7 @@ canvas.addEventListener('click', function(event) {
 	var x = event.pageX - canvas.offsetLeft;
 	var y = event.pageY - canvas.offsetTop;
 
-	click = new Circle(x, y, 0);
+	var click = new Circle(x, y, 0);
 
 	for (var idx in Circles) {
 		var circle = Circles[idx];
