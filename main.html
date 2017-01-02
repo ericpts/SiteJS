@@ -48,7 +48,7 @@ function circleScore(c) {
 }
 
 function circleHasNoCollisions(c) {
-	for(oth in Circles) {
+	for(var oth in Circles) {
 		var other = Circles[oth];
 		var d = distance(c, other);
 		if (d < c.r + other.r) {
@@ -69,7 +69,7 @@ function randomCircle() {
 		var y = Math.random() * kHeight;
 		var r = minR + Math.random() * (maxRadius - minR);
 
-		c = new Circle(x, y, r);
+		var c = new Circle(x, y, r);
 
 		if (circleHasNoCollisions(c)) {
 			return c;
@@ -85,7 +85,7 @@ function resetCanvas() {
 }
 
 function drawCircles() {
-	for(c in Circles) {
+	for(var c in Circles) {
 		var circle = Circles[c];
 		ctx.beginPath();
 		ctx.arc(circle.x, circle.y, circle.r, 0, 2 * Math.PI, false);
